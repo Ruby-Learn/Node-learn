@@ -1,42 +1,60 @@
-## Node.js
-- 크롬 V8 자바스크립트 엔진으로 빌드된 자바스크립트 런타임
-    - 런타임
-        - 특정 언어로 만든 프로그램들을 실행할 수 있는 환경
-- Node 의 내부 구조<br>
-  ![img.png](img/node-architecture.png)
+## Node 의 내장 객체
+- Node 에서 기본적으로 제공해주는 내장 객체
+- 별도의 설치 없이 바로 사용 가능
 
-## Node 의 특징
-- 이벤트 기반의 작업 수행
-  - 이벤트가 발생할 때 미리 지정해둔 작업을 수행
-      - ex ) 클릭, 네트워크 요청이 있을 때 작업을 수행
-  - 이벤트가 발생하면 이벤트 리스너에 등록해둔 콜백함수를 호출하여 발생한 이벤트가 없거나 이벤트를 다 처리하면 다음 이벤트가 발생할 때까지 대기<br>
-    ![img.png](img/event.png)
-- 논블로킹 I/O
-  - 오래 걸리는 함수를 백그라운드로 보내서 다음 코드가 먼저 실행되게 하고, 그 함수가 다시 태스크 큐를 거쳐 호출 스택으로 올라오기를 기다리는 방식
-      - 이전 작업이 완료될 때까지 대기하지 않고 다음 작업을 수행하게 함<br>
-        ![img.png](img/non-blocking.png)
-  - Node 는 논블로킹 I/O 모델을 사용함으로서 가볍고 효율이 좋음
-- 싱글 스레드
-  - 노드는 기본적으로 싱글 스레드, 논블로킹 방식으로 작업을 수행함
-  - 내부적으로는 스레드를 여러 개 가지고 있지만 직접 제어할 수 있는 스레드는 하나 뿐임<br>
-    ![img.png](img/single-thread.png)
+## 내장 객체의 종료
+### global
+- 브라우저의 window 와 같은 전역 객체
+- 생략하여 사용 가능
+  - ex) global.console.log => console.log
 
-## 서버로서의 Node
-![img.png](img/node-server.png)
+### console
+- 디버깅, 로깅을 위해 주로 사용하는 객체
+- console.time(레이블)
+  - console.timeEnd(레이블) 과 대응되어 같은 레이블을 가진 time 과 timeEnd 사이의 시간을 측정
+- console.log(내용)
+  - 평범한 로그를 콘솔에 표시
+- console.error(에러 내용)
+  - 에러를 콘솔에 표시
+- console.dir(객체, 옵션)
+  - 객체를 콘솔에 표시할 때 사용
+  - 옵션에 따라 콘솔에 색을 넣거 표시하거나 객체 안의 객체를 몇 단계까지 보여줄지를 결정할 수 있음
+- console.trace(레이블)
+  - 에러가 어디서 발생했는지 추적할 수 있음
 
-## Node.js 설치
+### 타이머
+- 타이머 기능을 제공하는 함수
+- setTimeout(콜백함수, 밀리초)
+  - 주어진 밀리초 이후에 콜백함수를 실행
+  - clearTimeout(아이디) 로 setTimeout 을 취소
+- setInterval(콜백함수, 밀리초)
+  - 주어진 밀리초마다 콜백함수를 실행
+  - clearInterval(아이디) 로 setInterval 을 취소
+- setImmediate(콜백함수, 밀리초)
+  - 콜백함수를 즉시 실행
+  - clearImmediate(아이디) 로 setImmediate 을 취소
 
-- 노드 다운로드 - [https://nodejs.org](https://nodejs.org)
-    - LTS
-        - 기업을 위해 3년간 지원하는 버전
-        - 서버를 안정적으로 운영해야 할 경우 사용하는 버전
-    - Current
-        - 최신 기능을 담고 있는 버전
-        - 서버에 신기능이 필요할 때 사용. 다소 실험적인 기능이 들어 있어 예기치 못한 에러가 발생할 수 있음
-- 노드 설치시에 npm 이 같이 설치됨
-- 노드 버전 확인
-    - node -v
-- npm 버전 확인
-    - npm -v
-    - npm 의 버전이 낮다면 npm 을 별도로 받아 업데이트
-        - npm i -g npm
+### __filename / __dirname
+- __filename
+  - 현재 파일명을 확인
+- __dirname
+  - 현재 파일이 위치한 폴더의 경로를 확인
+
+### module, exports
+- 모듈을 만들 때 사용하는 객체  
+![img.png](img/module.png)  
+*exports 객체에 다른 값을 넣으면 exports 와 module.exports 와의 참조관계가 끊어지므로 주의해야한다.*
+
+### process
+- 현재 실행되고 있는 노드 프로세스에 대한 정보를 담고 있는 객체
+- process.env
+  - 시스템의 환경 변수들을 담고 있는 객체
+  - 일반적으로 .env 파일에 환경 변수들을 설정하고 해당 값들을 사용함
+- process.nextTick(콜백함수)
+  - 이벤트 루프가 다른 콜백함수들보다 nextTick 의 콜백함수를 우선으로 처리하도록 함  
+    ![img.png](img/task.png)  
+    *resolve 된 Promise 와 nextTick 의 콜백함수는 다른 콜백들보다 우선으로 처리되며 이를 마이크로 태스크로 따로 구분짓기도 한다.*
+- process.exit(코드)
+  - 실행중인 노드 프로세스를 종료
+  - 코드 번호가 0 이거나 없으면 정상 종료를 의미
+  - 코드 번호가 1이면 비정상 종료를 의미
