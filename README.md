@@ -1,42 +1,74 @@
-## Node.js
-- 크롬 V8 자바스크립트 엔진으로 빌드된 자바스크립트 런타임
-    - 런타임
-        - 특정 언어로 만든 프로그램들을 실행할 수 있는 환경
-- Node 의 내부 구조<br>
-  ![img.png](img/node-architecture.png)
+## npm
+- Node Package Manager
+- 자바스크립트 프로그래밍 언어를 위한 패키지 관리자
+  - 자바 진영의 Maven Repository 와 같은 역할
+- npm 에 등록되어 있는 패키지를 찾아 설치할 수 있다.
 
-## Node 의 특징
-- 이벤트 기반의 작업 수행
-  - 이벤트가 발생할 때 미리 지정해둔 작업을 수행
-      - ex ) 클릭, 네트워크 요청이 있을 때 작업을 수행
-  - 이벤트가 발생하면 이벤트 리스너에 등록해둔 콜백함수를 호출하여 발생한 이벤트가 없거나 이벤트를 다 처리하면 다음 이벤트가 발생할 때까지 대기<br>
-    ![img.png](img/event.png)
-- 논블로킹 I/O
-  - 오래 걸리는 함수를 백그라운드로 보내서 다음 코드가 먼저 실행되게 하고, 그 함수가 다시 태스크 큐를 거쳐 호출 스택으로 올라오기를 기다리는 방식
-      - 이전 작업이 완료될 때까지 대기하지 않고 다음 작업을 수행하게 함<br>
-        ![img.png](img/non-blocking.png)
-  - Node 는 논블로킹 I/O 모델을 사용함으로서 가볍고 효율이 좋음
-- 싱글 스레드
-  - 노드는 기본적으로 싱글 스레드, 논블로킹 방식으로 작업을 수행함
-  - 내부적으로는 스레드를 여러 개 가지고 있지만 직접 제어할 수 있는 스레드는 하나 뿐임<br>
-    ![img.png](img/single-thread.png)
+### package.json
+- 설치된 패키지 및 버전을 관리하기 위한 파일
+  - gradle 파일과 같은 역할을 담당
 
-## 서버로서의 Node
-![img.png](img/node-server.png)
+### package.json 생성
+```markdown
+npm init
+```
+```json
+{
+  "name": "package",
+  "version": "1.0.0",
+  "description": "- Node Package Manager - 자바스크립트 프로그래밍 언어를 위한 패키지 관리자   - 자바 진영의 Maven Repository 와 같은 역할 - npm 에 등록되어 있는 패키지를 찾아 설치할 수 있다.",
+  "main": "index.js",
+  
+  // scripts - npm 명령어를 저장해두는 부분 npm run [명령어] 를 입력하여 해당 스크립트를 실행
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ruby-Learn/Node-learn.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ruby-Learn/Node-learn/issues"
+  },
+  "homepage": "https://github.com/Ruby-Learn/Node-learn#readme",
 
-## Node.js 설치
+  // dependencies - npm 을 통해 설치한 패키지를 기록. npm install 을 통해 기록된 패키지를 다시 설치할 수 있다. 패키지는 node_modules 폴더에 설치
+  //  - package.json 파일이 있다면 필요한 패키지들을 npm install 을 통해 다시 설치할 수 있으므로 node_modules 는 git 등에 보관할 필요가 없다.
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+```
 
-- 노드 다운로드 - [https://nodejs.org](https://nodejs.org)
-    - LTS
-        - 기업을 위해 3년간 지원하는 버전
-        - 서버를 안정적으로 운영해야 할 경우 사용하는 버전
-    - Current
-        - 최신 기능을 담고 있는 버전
-        - 서버에 신기능이 필요할 때 사용. 다소 실험적인 기능이 들어 있어 예기치 못한 에러가 발생할 수 있음
-- 노드 설치시에 npm 이 같이 설치됨
-- 노드 버전 확인
-    - node -v
-- npm 버전 확인
-    - npm -v
-    - npm 의 버전이 낮다면 npm 을 별도로 받아 업데이트
-        - npm i -g npm
+### package-lock.json
+- npm 으로 패키지를 설치, 수정, 삭제할 때마다 내부 의존관계를 저장
+  - package.json 에 기재된 패키지와 의존관계에 있는 모든 패키지가 기재됨
+
+### package version
+- 노드 패키지들의 버전은 항상 세 자리로 구성되며 각 자리마다 의미를 가짐
+  - ex) 1.0.7
+- 첫 번째 자리
+  - major 버전을 가리킴
+    - 0 - 초기 개발 중
+    - 1 - 정식 버전
+  - 하위 호환이 안 될 정도로 패키지의 내용이 수정되었을 때 major 버전을 올림
+- 두 번째 자리
+  - minor 버전을 가리킴
+  - 하위 호환이 되는 기능 업데이트 시에 minor 버전을 올림
+  - 기존 하위 버전에서 minor 버전을 업데이트 했을 때에는 아무 문제가 없어야 함
+- 세 번째 자리
+  - patch 버전을 가리킴
+  - 새로운 기능의 추가가 아닌 기존 기능에 문제가 있던 부분을 수정한 경우에 patch 버전을 올림  
+    ![img.png](img/version.png)
+
+### 기타 npm 명령어
+- npm outdated
+  - 업데이트할 수 있는 패키지가 있는지 확인
+- npm update
+  - 업데이트 가능한 모든 패키지를 업데이트
+- npm uninstall [패키지명] / npm rm [패키지명]
+  - 지정한 패키지를 제거
+- npm search [검색어]
+  - npm 저장소로부터 패키지를 검색
